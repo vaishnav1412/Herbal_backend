@@ -18,7 +18,7 @@ const server = http.createServer(app)
 
 const io = new Server(server,{
     cors:{
-        origin:"http://localhost:3000",
+        origin:"https://herbalnutritionproject.netlify.app",
         methods:["GET","POST"]
     }
 }) 
@@ -50,5 +50,5 @@ socket.on("disconnect",() =>{
 
 
 
-const port =process.env.PORT || 5000
+const port =process.env.PORT || 3000
 server.listen(port,()=>{console.log(`server started on port: ${port}`);}) 
