@@ -3,11 +3,10 @@ const app = express()
 const http = require("http")
 require("dotenv").config();
 const cors = require("cors")
-const passport = require("passport")
 const dbConfig=require('./config/dbConfig')
 app.use(express.json())
 const { Server } = require('socket.io');
-app.use(cors())
+app.use(cors());
 const user_route =require('./routes/user_route')
 const admin_route = require('./routes/admin_route');
 const { upload } = require('./config/multer');
@@ -28,21 +27,22 @@ io.on("connection", (socket) =>{
  console.log(`User Connected:${socket.id}`)
 
  socket.on("join_room",(data)=>{
-    console.log(data);
+   
     socket.join(data)
-    // console.log(`User with ID:${socket.id} joined room:${data}`);
+    console.log(`User with ID:${socket.id} joined room:${data}`);
     console.log(socket.rooms)
  })
 
  socket.on("send_message",async(data)=>{
    
-    console.log(socket.rooms)
+    console.log(data)
 
-    socket.emit("receive_message",data.message)
+    socket.to(data.room).emit("receive_message",data.message);
+    console.log(data.room);
     await messageController.saveChat(data)
-
+  
  })
-socket.on("disconnect",() =>{
+socket.on("disconnect",() =>{   
     console.log("User Disconnected",socket.id);
 })
 

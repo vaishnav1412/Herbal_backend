@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
-const User = require("../models/userModel"); 
-const Plan = require("../models/planModel"); 
+const users = require("../models/userModel"); 
+const plans = require("../models/planModel"); 
 
 const subscriptionSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  planId: {type: mongoose.Schema.Types.ObjectId,ref: "Plan",required: true},
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true },
+  planId: {type: mongoose.Schema.Types.ObjectId,ref: "plans",required: true},
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   amount: {type:Number,required:true},

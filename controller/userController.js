@@ -31,6 +31,62 @@ const sendOTP = async (email, otp) => {
   }
 };
 
+const register =  async (req, res) => {
+  try {
+    const userExist = await User.findOne({ email: req.body.email });
+    if (userExist) {
+      return res
+        .status(200)
+        .send({ message: "User alredy exists", success: false });
+    } else {
+      const otp = otpGenerator.generate(6, {
+        digits: true,
+        alphabets: false,
+        upperCase: false,
+        specialChars: false,
+      });
+      sendOTP(req.body.email, otp);
+      const password = req.body.password;
+      const salt = await bcrypt.genSalt(10);
+      const hashPassword = await bcrypt.hash(password, salt);
+      req.body.password = hashPassword;
+
+      const newuser = new User(req.body);
+      newuser.otp = otp;
+
+      await newuser.save();
+
+      res
+        .status(200)
+        .send({ message: "User created sucessfully.", success: true });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .send({ message: "Error creating user", success: false, error });
+  }
+}
+
+const registerOtp = async(req,res)=>{
+  try {
+      const user = await User.findOne({ email: req.body.email });
+      
+      let otp= req.body.otp
+      if(user.otp ===otp){
+          const update = await User.findOneAndUpdate(
+              { email: req.body.email },
+              { $set: { isVarified: 1 } }
+            );
+            res.status(200).send({ message: "Email has been varified", success: true });
+      }else{
+          res.status(200).send({ message: "Otp validation failed", success: false});
+      }
+
+  } catch (error) {
+      res.status(500).send({ message: "something went wrong", success: false });
+  }
+}
+
 
 const googleLogin = async(req,res) =>{
  try {
@@ -341,6 +397,7 @@ const unblock_user = async (req, res) => {
 };
 
 const userDetails = async (req, res) => {
+ 
   try {
     id = req.userId;
     const user = await User.findOne({ _id: id });
@@ -692,6 +749,8 @@ module.exports = {
   googleLogin,
   getAdminData,
   getPrimeUserDetails,
-  fetchSingleData
+  fetchSingleData,
+  register,
+  registerOtp
   
 };

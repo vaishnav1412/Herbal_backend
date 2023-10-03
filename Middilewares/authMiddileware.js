@@ -12,6 +12,7 @@ module.exports = async (req,res,next)=>{
          return  res.status(401).send({ message: "authentification failed", success: false });
       }else{
            const role= decoded.role
+           
         if(role==='user'){
   
          const user = await User.findOne({_id:decoded.id})

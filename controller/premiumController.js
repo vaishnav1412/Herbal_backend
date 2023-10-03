@@ -491,10 +491,51 @@ const fetchUserSubscribeHistory = async (req, res) => {
 
 const primiumCoustomers = async (req,res) =>{
   try {
-   
+
+    const details = await Prime.find({})
+    .populate('userId')   
+    .populate('planId'); 
+    if(details){
+
+      res
+      .status(200)
+      .send({success: true,data:details});
+
+    }else{
+      res
+      .status(200)
+      .send({ message: "no membership purchase are present", success: false });
+    }
+
+    
   } catch (error) {
     console.log(error);
   }
+}
+
+
+const collectData = async(req,res) =>{
+ 
+try {
+  const id = req.body.id
+
+  const data = await Prime.findOne({_id:id}).populate('userId')   
+  .populate('planId');
+  
+  if(data){
+    res
+    .status(200)
+    .send({success: true,data:data.purchaseHistory});
+
+  }else{
+    res
+    .status(200)
+    .send({ message: "no membership purchase are present", success: false });
+  }
+  
+} catch (error) {
+  console.log(error);
+}
 }
 
 module.exports = {
@@ -505,5 +546,6 @@ module.exports = {
   verifypayment,
   primecheck,
   fetchUserSubscribeHistory,
-  primiumCoustomers
+  primiumCoustomers,
+  collectData
 };

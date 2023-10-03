@@ -315,8 +315,13 @@ const fetchCatogoryProduct = async (req,res) =>{
 
 const priceSort = async(req,res) =>{
   try {
-    const  range = req.body.selectedPrice
-    console.log(range);
+    const range = req.body.selectedPrice;
+
+    if (!range) {
+      res.status(400).send({ message: "The selectedPrice property is required." });
+      return;
+    }
+
     const priceRangeMap = {
       '1': { min: 0, max: 500 },
       '2': { min: 500, max: 1000 },
@@ -330,14 +335,11 @@ const priceSort = async(req,res) =>{
     const { min, max } = priceRangeMap[range];
     const products = await Product.find({ price: { $gte: min, $lte: max } });
 
-    if(products){
-
-      res.status(200).send({ success: true, data: products});
-    }else{
+    if (products) {
+      res.status(200).send({ success: true, data: products });
+    } else {
       res.status(200).send({ message: "something wrong", success: false });
-
     }
-    
   } catch (error) {
     console.log(error);
   }
