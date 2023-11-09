@@ -2,12 +2,19 @@ const Cart = require("../models/cartModel");
 const User = require("../models/userModel");
 const Product = require("../models/productModel");
 const Address =require('../models/addressModel')
+const mongoose = require('mongoose');
+const sanitizeId = (Id) => {
+  if (!mongoose.ObjectId.isValid(Id)) {
+    throw new Error('Invalid id');
+  }
+  return mongoose.ObjectId(Id);
+};
 
 const addToCart = async (req, res) => {
   console.log('iam here');
   try {
-    const productId = req.body.productId;
-    const id = req.body.id;
+    const productId = sanitizeId( req.body.productId);
+    const id =sanitizeId( req.body.id);
     const user = await User.findOne({ _id: id });
     const product = await Product.findOne({ _id: productId });
     if (user && product) {
@@ -89,9 +96,8 @@ const addToCart = async (req, res) => {
         .send({ message: "product added to cart failed", success: false });
     }
   } catch (error) {
-    res
-      .status(400)
-      .send({ message: "product added to cart failed", success: false });
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
@@ -129,16 +135,15 @@ console.log(id,"chech");
         .send({ message: "fetching cart details failed..", success: false });
     }
   } catch (error) {
-    res
-      .status(400)
-      .send({ message: "fetching cart details failed", success: false });
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const increment = async (req, res) => {
   try {
-    const id = req.body.id;
-    const userId = req.body.userId;
+    const id =sanitizeId( req.body.id)
+    const userId =  sanitizeId(req.body.userId)
 
     if (id && userId) {
       const cartData = await Cart.updateOne(
@@ -192,15 +197,16 @@ res.status(200).send({ success: true });
       res.status(200).send({ message: "something went wrong", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 
 const decrement = async (req, res) => {
   try {
-    const id = req.body.id;
-    const userId = req.body.userId;
+    const id =  sanitizeId(req.body.id)
+    const userId =  sanitizeId(req.body.userId)
     if (id && userId) {
       const productData = await Product.findOne({ _id: id });
       const productstock = productData.stock;
@@ -245,15 +251,16 @@ const decrement = async (req, res) => {
       res.status(200).send({ message: "something went wrong", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 
 const deleteCartProduct = async(req,res) =>{
     try {
-        const productId = req.body.productId
-        const userId = req.body.userId
+        const productId = sanitizeId(req.body.productId)
+        const userId = sanitizeId(req.body.userId)
        if(productId){
         const result = await Cart.updateOne(
             { userId: userId },
@@ -273,7 +280,8 @@ const deleteCartProduct = async(req,res) =>{
        }
         
     } catch (error) {
-        console.log(error);
+      console.error("An error occurred:", error);
+      res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 

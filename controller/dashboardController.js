@@ -1,6 +1,13 @@
 const Order = require("../models/orderModel")
 const Prime = require("../models/subscriptionModel");
 const User = require("../models/userModel");
+const mongoose = require('mongoose');
+const sanitizeId = (Id) => {
+    if (!mongoose.ObjectId.isValid(Id)) {
+      throw new Error('Invalid id');
+    }
+    return mongoose.ObjectId(Id);
+  };
 
 const dashboardData = async (req,res) =>{
    
@@ -35,7 +42,8 @@ const dashboardData = async (req,res) =>{
         .send({ message: "something went wrong", success: false });
        }
     } catch (error) {
-        console.log(error);
+        console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
     }
 }  
 module.exports ={

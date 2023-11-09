@@ -1,7 +1,18 @@
 const Address =require('../models/addressModel')
+const mongoose = require('mongoose');
+
+const sanitizeId = (Id) => {
+  if (!mongoose.ObjectId.isValid(Id)) {
+    throw new Error('Invalid id');
+  }
+  return mongoose.ObjectId(Id);
+};
+
+
 const checkoutaddressadd =async (req, res) => {
   try {
-    const id = req.body.id;
+
+    const id= sanitizeId( req.body.id);
     const houseName =req.body.houseName
     const place = req.body.place
     const district =req.body.district
@@ -71,7 +82,7 @@ const checkoutaddressadd =async (req, res) => {
 
 const addressadd = async (req, res) => {
   try {
-    const id = req.body.id;
+    const id =sanitizeId( req.body.id)
     const houseName =req.body.houseName
     const place = req.body.place
     const district =req.body.district
@@ -139,7 +150,7 @@ const addressadd = async (req, res) => {
 const editProfileAddress = async (req,res) =>{
 
     try {
-        const id = req.body.id;
+        const id = sanitizeId( req.body.id)
         const name = req.body.name;
         const place = req.body.place;
         const district = req.body.district;
@@ -188,15 +199,16 @@ const editProfileAddress = async (req,res) =>{
           res.status(200).send({ message: "you dont make any change", success: false });
         }
     } catch (error) {
-        console.log(error);
+      console.error("An error occurred:", error);
+      res.status(500).send({ message: "Internal server error", success: false });
     }
 
 }
 
 const deleteAddress = async(req,res) =>{
   try {
-    const  addressId= req.body. addressId
-    const userId = req.body.id
+    const  addressId= sanitizeId( req.body.addressId)
+    const userId =sanitizeId( req.body.id)
     
    if( addressId){
     
@@ -220,11 +232,12 @@ const deleteAddress = async(req,res) =>{
    }
     
 } catch (error) {
-    console.log(error);
+  console.error("An error occurred:", error);
+  res.status(500).send({ message: "Internal server error", success: false });
 }
 }
 const usercheckoutaddressedit = async(req,res) =>{
-  console.log('hai');
+ 
   try {
     
     const name = req.body.name;
@@ -318,15 +331,16 @@ const usercheckoutaddressedit = async(req,res) =>{
       res.status(200).send({ message: "you dont make any change", success: false });
     }
 } catch (error) {
-    console.log(error);
+  console.error("An error occurred:", error);
+  res.status(500).send({ message: "Internal server error", success: false });
 }
 }
 const fetchsingleaddress = async (req,res) =>{
  
   try {
 
-    const addressId = req.body.addressId
-    const id = req.body.id
+    const addressId = sanitizeId( req.body.addressId)
+    const id = sanitizeId( req.body.id)
     
    console.log(addressId);
     if (addressId) {
@@ -344,7 +358,8 @@ const fetchsingleaddress = async (req,res) =>{
       res.status(200).send({ message: "something went worng..", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 }
 

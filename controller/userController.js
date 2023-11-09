@@ -1,6 +1,13 @@
 const User = require("../models/userModel");
 const Address = require("../models/addressModel");
 const Prime = require("../models/subscriptionModel");
+const mongoose = require('mongoose');
+const sanitizeId = (Id) => {
+  if (!mongoose.ObjectId.isValid(Id)) {
+    throw new Error('Invalid id');
+  }
+  return mongoose.ObjectId(Id);
+};
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -27,7 +34,8 @@ const sendOTP = async (email, otp) => {
     await transporter.sendMail(mailOptions);
     console.log("OTP sent to:", email);
   } catch (error) {
-    console.error("Error sending OTP:", error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
@@ -83,7 +91,8 @@ const registerOtp = async(req,res)=>{
       }
 
   } catch (error) {
-      res.status(500).send({ message: "something went wrong", success: false });
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 }
 
@@ -140,7 +149,8 @@ if(userData){
 
   }
  } catch (error) {
-  console.log(error);
+  console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
  }
  
 }
@@ -207,7 +217,7 @@ const verify = async (req, res) => {
 
 const admin_verify = async (req, res) => {
   try {
-    const admin = await User.findOne({ _id: req.adminId });
+    const admin = await User.findOne({ _id: sanitizeId(req.adminId) });
     if (!admin) {
       res.status(200).send({ message: "admin does not exist", success: false });
     } else {
@@ -307,7 +317,8 @@ const forgototpmatch = async (req, res) => {
       res.status(200).send({ success: true });
     }
   } catch (error) {
-    console.log(error.message);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
@@ -374,7 +385,8 @@ const block_user = async (req, res) => {
         .send({ message: "Successfully blocked the user", success: true });
     }
   } catch (error) {
-    res.status(500).send({ message: "something wrong...", success: false });
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 const unblock_user = async (req, res) => {
@@ -392,14 +404,15 @@ const unblock_user = async (req, res) => {
         .send({ message: "sucessfully unblocked the user", success: true });
     }
   } catch (error) {
-    res.status(500).send({ message: "something wrong...", success: false });
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const userDetails = async (req, res) => {
  
   try {
-    id = req.userId;
+    id = sanitizeId(req.userId);
     const user = await User.findOne({ _id: id });
     const address = await Address.findOne({ userId: id });
     if (address) {
@@ -420,7 +433,8 @@ const userDetails = async (req, res) => {
       }
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 const uploadImage = async (req, res) => {
@@ -461,7 +475,8 @@ const uploadImage = async (req, res) => {
       }
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
@@ -504,7 +519,8 @@ const uploadImages = async (req, res) => {
 }
 
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
@@ -518,12 +534,13 @@ const adminProfileDetails = async (req, res) => {
       res.status(200).send({ message: "something wrong", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 const addprofiledetails = async (req, res) => {
   try {
-    const id = req.body.id;
+    const id = sanitizeId( req.body.id);
     const role = req.body.role;
     const experience = req.body.experience;
     const qualification = req.body.qualification;
@@ -544,13 +561,14 @@ const addprofiledetails = async (req, res) => {
       res.status(200).send({ message: "something wrong", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const adminprofileeditdata = async (req, res) => {
   try {
-    const id = req.body.id;
+    const id = sanitizeId( req.body.id);
     const role = req.body.role;
     const experience = req.body.experience;
     const qualification = req.body.qualification;
@@ -584,13 +602,14 @@ const adminprofileeditdata = async (req, res) => {
         .send({ message: "you dont make any change", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const fetchdetails = async (req, res) => {
   try {
-    const id = req.body.id;
+    const id = sanitizeId(req.body.id);
     if (id) {
       const data = await User.findOne({ _id: id });
       if (data) {
@@ -604,13 +623,14 @@ const fetchdetails = async (req, res) => {
       res.status(200).send({ message: "something went wrong", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const savebmi = async (req, res) => {
   const bmi = req.body.bmi;
-  const id = req.body.id;
+  const id = sanitizeId(req.body.id);
 
   try {
     const responce = await User.findOneAndUpdate(
@@ -618,13 +638,14 @@ const savebmi = async (req, res) => {
       { $set: { bmi: bmi } }
     );
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const editUserProfile = async (req, res) => {
   try {
-    const id = req.body.id;
+    const id = sanitizeId(req.body.id);
     const name = req.body.name;
     const age = req.body.age;
     const email = req.body.email;
@@ -658,7 +679,8 @@ const editUserProfile = async (req, res) => {
         .send({ message: "you dont make any change", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
@@ -676,7 +698,8 @@ const getAdminData = async(req,res) =>{
    }
   
   } catch (error) {
-  console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
  }
 }
 
@@ -696,7 +719,8 @@ const getPrimeUserDetails = async(req,res) =>{
     }
     
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 }
 const fetchSingleData = async(req,res) =>{
@@ -722,7 +746,8 @@ const fetchSingleData = async(req,res) =>{
    }
     
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 }
 

@@ -66,12 +66,7 @@ user_route.post('/purchase',authMiddileware,premiumController.purchase)
 user_route.post('/verifypayment',authMiddileware,premiumController.verifypayment)
 user_route.post('/usercheckoutaddressedit',authMiddileware,addressController.usercheckoutaddressedit)
 user_route.post('/fetchsingleaddress',authMiddileware,addressController.fetchsingleaddress)
-
-
-
-
 user_route.post('/getadmindata',userController.getAdminData)
-user_route.post('/getchatdata',chatController.ChatLogs)
 user_route.post('/roomcheck',videocallController.validateRoomid)
 user_route.post('/findroomid',videocallController.fetchRoomId)
 

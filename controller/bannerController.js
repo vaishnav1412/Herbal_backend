@@ -1,4 +1,11 @@
 const Banner = require("../models/bannerModel") 
+const mongoose = require('mongoose');
+const sanitizeId = (Id) => {
+  if (!mongoose.ObjectId.isValid(Id)) {
+    throw new Error('Invalid id');
+  }
+  return mongoose.ObjectId(Id);
+};
 
 
 const addBanner =async(req,res)=>{
@@ -55,7 +62,8 @@ const fetchBanner = async(req,res) =>{
     res.status(200).send({message: "fetching banner failed" , success: true })
   }
  } catch (error) {
-  console.log(error);
+  console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
  }
 }
 
@@ -69,7 +77,8 @@ const deleteBanner =async (req,res) =>{
     res.status(200).send({message: "something went wrong", success: false })
   }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 }
 

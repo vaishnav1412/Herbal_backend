@@ -1,4 +1,11 @@
 const Room = require("../models/videocallRoomModel");
+const mongoose = require('mongoose');
+const sanitizeId = (Id) => {
+  if (!mongoose.ObjectId.isValid(Id)) {
+    throw new Error('Invalid id');
+  }
+  return mongoose.ObjectId(Id);
+};
 
 const validateRoomid = async (req, res) => {
   try {
@@ -20,7 +27,8 @@ const validateRoomid = async (req, res) => {
       .send({ message: "something went wrong", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
@@ -69,21 +77,28 @@ const addRoomId = async (req, res) => {
 
         }
     } catch (error) {
-        console.log(error);
+      console.error("An error occurred:", error);
+      res.status(500).send({ message: "Internal server error", success: false });
     }
   }
 
   const deleteRoom = async(req,res) =>{
-    const response =   await Room.deleteMany({});
-    if(response) {
-      res
-      .status(200)
-      .send({ message: "room deleted sucessfully", success: true });
-    }else{
-      res
-      .status(200)
-      .send({ message: "something went wrong", success: false });
+    try {
+      const response =   await Room.deleteMany({});
+      if(response) {
+        res
+        .status(200)
+        .send({ message: "room deleted sucessfully", success: true });
+      }else{
+        res
+        .status(200)
+        .send({ message: "something went wrong", success: false });
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      res.status(500).send({ message: "Internal server error", success: false });
     }
+   
   } 
 
 module.exports = {

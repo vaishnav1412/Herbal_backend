@@ -1,5 +1,15 @@
 const User = require("../models/userModel"); 
 const Workout =require("../models/workoutModel")
+const mongoose = require('mongoose');
+
+
+const sanitizeId = (Id) => {
+    if (!mongoose.ObjectId.isValid(Id)) {
+      throw new Error('Invalid id');
+    }
+    return mongoose.ObjectId(Id);
+  };
+
 
 const addVideos = async(req,res) =>{
 
@@ -18,7 +28,8 @@ const addVideos = async(req,res) =>{
             res.status(200).send({ message:"Something went wrong",success: false });
         }
     } catch (error) {
-        console.log(error);
+        console.error("An error occurred:", error);
+        res.status(500).send({ message: "Internal server error", success: false });
     }
 
 }
@@ -34,13 +45,14 @@ const listVideos = async (req,res) =>{
   }
         
     } catch (error) {
-        console.log(error);
+        console.error("An error occurred:", error);
+        res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 
 const deleteVideo = async (req,res) =>{
     try {
-        const id = req.body.id
+        const id = sanitizeId(req.body.id);
       if(id){
        const workout =await Workout.findOneAndDelete({_id:id})
        if(workout){
@@ -52,7 +64,8 @@ const deleteVideo = async (req,res) =>{
         res.status(200).send({message: "something went wrong", success: false })
       }
       } catch (error) {
-        console.log(error);
+        console.error("An error occurred:", error);
+      res.status(500).send({ message: "Internal server error", success: false });
       }
 }
 

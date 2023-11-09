@@ -2,11 +2,18 @@ const { response } = require("express");
 const Prime = require("../models/subscriptionModel");
 const User = require("../models/userModel");
 const Room = require("../models/videocallRoomModel");
+const mongoose = require('mongoose');
+const sanitizeId = (Id) => {
+    if (!mongoose.ObjectId.isValid(Id)) {
+      throw new Error('Invalid id');
+    }
+    return mongoose.ObjectId(Id);
+  };
 
 
 const takeStatus = async(req,res) =>{
     try {
-        const id =  req.body.id
+        const id =  sanitizeId(req.body.id)
         if(id){
             const user = await User.findOne({_id:id})
             if(user.isPrime===1){
@@ -35,7 +42,8 @@ const takeStatus = async(req,res) =>{
             res.status(200).send({ success: false });
         }
     } catch (error) {
-        console.log(error);
+        console.error("An error occurred:", error);
+        res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 
@@ -54,7 +62,8 @@ const liveStatus = async(req,res) =>{
         }
         
     } catch (error) {
-        console.log();
+        console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 

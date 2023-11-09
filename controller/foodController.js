@@ -1,5 +1,11 @@
 const Food = require('../models/foodModel')
-
+const mongoose = require('mongoose');
+const sanitizeId = (Id) => {
+    if (!mongoose.ObjectId.isValid(Id)) {
+      throw new Error('Invalid id');
+    }
+    return mongoose.ObjectId(Id);
+  };
 
 const addFood = async ( req,res ) =>{
     try {
@@ -24,7 +30,8 @@ const addFood = async ( req,res ) =>{
         }
         
     } catch (error) {
-        console.log(error);
+        console.error("An error occurred:", error);
+        res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 
@@ -38,12 +45,13 @@ const fetchfood = async(req,res) =>{
             res.status(200).send({  success: false });
         }
     } catch (error) {
-        console.log(error);
+        console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 const deletefood =async (req,res)=>{
     try {
-    const id = req.body.id
+    const id = sanitizeId(req.body.id)
     if(id){
         const response = await Food.findOneAndRemove({_id:id})
         if(response){
@@ -57,12 +65,13 @@ const deletefood =async (req,res)=>{
 
         
     } catch (error) {
-        console.log(error);
+        console.error("An error occurred:", error);
+        res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 const fetchidfood = async(req,res) =>{
     try {
-        const id = req.body.id
+        const id = sanitizeId(req.body.id)
         const menu = await Food.findOne({ _id:id })
         if(menu){
             res.status(200).send({  success: true ,data:menu});
@@ -70,14 +79,15 @@ const fetchidfood = async(req,res) =>{
             res.status(200).send({ message: "something went worng", success: false });
         }
     } catch (error) {
-        console.log(error);
+        console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 
 const editfood = async (req,res) =>{
     try {
 
-        const id = req.body.id
+        const id = sanitizeId(req.body.id)
         const day = req.body.day
         const type = req.body.type
         const time = req.body.time
@@ -136,7 +146,8 @@ const editfood = async (req,res) =>{
         }
         
     } catch (error) {
-        console.log(error);
+        console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 
@@ -149,7 +160,8 @@ const fetchlose = async(req,res) =>{
             res.status(200).send({ message: "No datas present", success: false });
         }
     } catch (error) {
-        console.log(error);
+        console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 const fetchgain = async(req,res) =>{
@@ -161,7 +173,8 @@ const fetchgain = async(req,res) =>{
             res.status(200).send({ message: "No datas present", success: false });
         }
     } catch (error) {
-        console.log(error);
+        console.error("An error occurred:", error);
+        res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 

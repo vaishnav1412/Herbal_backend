@@ -1,4 +1,11 @@
 const Product = require("../models/productModel");
+const mongoose = require('mongoose');
+const sanitizeId = (Id) => {
+  if (!mongoose.ObjectId.isValid(Id)) {
+    throw new Error('Invalid id');
+  }
+  return mongoose.ObjectId(Id);
+};
 
 const addProducts = async (req, res) => {
   try {
@@ -45,7 +52,8 @@ const addProducts = async (req, res) => {
   }
 }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 const fetchProducts = async (req, res) => {
@@ -57,13 +65,14 @@ const fetchProducts = async (req, res) => {
       res.status(200).send({ message: "something went worng", success: false });
     }
   } catch (error) {
-    console.log(console.error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const block_product = async (req, res) => {
   try {
-    const id = req.body.id;
+    const id = sanitizeId(req.body.id);
     if (!id) {
       res.status(200).send({ message: "something wrong", success: false });
     } else {
@@ -77,12 +86,13 @@ const block_product = async (req, res) => {
         .send({ message: "Successfully blocked the products", success: true });
     }
   } catch (error) {
-    res.status(500).send({ message: "something wrong...", success: false });
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 const unblock_product = async (req, res) => {
   try {
-    const id = req.body.id;
+    const id =sanitizeId(req.body.id);
     if (!id) {
       res.status(200).send({ message: "something wrong", success: false });
     } else {
@@ -95,13 +105,14 @@ const unblock_product = async (req, res) => {
         .send({ message: "sucessfully unblocked the product", success: true });
     }
   } catch (error) {
-    res.status(500).send({ message: "something wrong...", success: false });
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const fetchProduct = async (req, res) => {
   try {
-    const id = req.body.id;
+    const id = sanitizeId(req.body.id);
     if (id) {
       const product = await Product.findOne({ _id: id });
       if (product) {
@@ -113,7 +124,8 @@ const fetchProduct = async (req, res) => {
       res.status(200).send({ message: "something wrong", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
@@ -178,7 +190,8 @@ const editproducts = async (req, res) => {
         .send({ message: "you dont make any change", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
@@ -189,7 +202,7 @@ const editproductswithimage = async (req, res) => {
   const stock = req.body.stock;
   const description = req.body.description;
   const image = req.file.filename;
-  const productId = req.body.productId;
+  const productId = sanitizeId(req.body.productId);
   const catogory = req.body.catogory;
 
   try {
@@ -251,7 +264,8 @@ const editproductswithimage = async (req, res) => {
         .send({ message: "you dont make any change", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
@@ -264,13 +278,14 @@ const userfetchproducts = async (req, res) => {
       res.status(200).send({ message: "something went worng", success: false });
     }
   } catch (error) {
-    console.log(console.error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const detailProduct = async(req,res) =>{
 try {
-  const productId = req.body.productId
+  const productId = sanitizeId(req.body.productId)
   if (productId) {
     const product = await Product.find({_id:productId});
     if (product) {
@@ -282,7 +297,8 @@ try {
     res.status(200).send({ message: "something went worng", success: false });
   }
 } catch (error) {
-  console.log(error);
+  console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
 }
 }
 
@@ -309,7 +325,8 @@ const fetchCatogoryProduct = async (req,res) =>{
       }
    
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 }
 
@@ -341,7 +358,8 @@ const priceSort = async(req,res) =>{
       res.status(200).send({ message: "something wrong", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 }
 

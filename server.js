@@ -18,37 +18,10 @@ const server = http.createServer(app)
 
 const io = new Server(server,{
     cors:{
-        origin:"https://herbalnutritionproject.netlify.app",
+        origin:"*",
         methods:["GET","POST"]
     }
 }) 
 
-io.on("connection", (socket) =>{
- console.log(`User Connected:${socket.id}`)
-
- socket.on("join_room",(data)=>{
-   
-    socket.join(data)
-    console.log(`User with ID:${socket.id} joined room:${data}`);
-    console.log(socket.rooms)
- })
-
- socket.on("send_message",async(data)=>{
-   
-    console.log(data)
-
-    socket.to(data.room).emit("receive_message",data.message);
-    console.log(data.room);
-    await messageController.saveChat(data)
-  
- })
-socket.on("disconnect",() =>{   
-    console.log("User Disconnected",socket.id);
-})
-
-})
-
-
-
-const port =process.env.PORT || 3000
+const port =process.env.PORT || 3001
 server.listen(port,()=>{console.log(`server started on port: ${port}`);}) 

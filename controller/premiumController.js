@@ -3,8 +3,14 @@ const Prime = require("../models/subscriptionModel");
 const Razorpay = require("razorpay");
 const User = require("../models/userModel");
 const Order = require("../models/orderModel");
+const mongoose = require("mongoose");
 require("dotenv").config();
-
+const sanitizeId = (Id) => {
+  if (!mongoose.ObjectId.isValid(Id)) {
+    throw new Error("Invalid id");
+  }
+  return mongoose.ObjectId(Id);
+};
 var instance = new Razorpay({
   key_id: process.env.Key_Id,
   key_secret: process.env.Key_Secret,
@@ -34,7 +40,8 @@ const addPlan = async (req, res) => {
       res.status(200).send({ message: "plan updation failed", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
@@ -45,13 +52,14 @@ const fetchData = async (req, res) => {
       res.status(200).send({ success: true, data: response });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const deletePlan = async (req, res) => {
   try {
-    const id = req.body.id;
+    const id = sanitizeId(req.body.id);
 
     if (id) {
       const response = await Plan.findOneAndDelete({ _id: id });
@@ -68,13 +76,14 @@ const deletePlan = async (req, res) => {
       res.status(200).send({ message: "plan deletion failed", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const purchase = async (req, res) => {
   try {
-    const id = req.body.id;
+    const id = sanitizeId(req.body.id);
     const planId = req.body.plan;
     const plan = await Plan.findOne({ _id: planId });
     const amounts = plan.price;
@@ -386,13 +395,14 @@ const updateUserPurchaseHistory = async (userId, orderId, amount) => {
       { $push: { purchaseHistory: purchaseRecord } }
     );
   } catch (error) {
-    console.error("Error updating purchase history:", error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const verifypayment = async (req, res) => {
   try {
-    const userId = req.body.id;
+    const userId = sanitizeId(req.body.id);
     if (userId) {
       const user = await User.findOne({ _id: userId });
       if (user) {
@@ -420,13 +430,14 @@ const verifypayment = async (req, res) => {
         .send({ message: "payment varification failed", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const primecheck = async (req, res) => {
   try {
-    const id = req.body.id;
+    const id = sanitizeId(req.body.id);
     if (id) {
       const plan = await Prime.findOne({ userId: id });
       if (plan) {
@@ -459,84 +470,77 @@ const primecheck = async (req, res) => {
       res.status(200).send({ message: "Something went wrong", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const fetchUserSubscribeHistory = async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId =  sanitizeId( req.userId);
     if (userId) {
-      const plans = await Prime.find({userId:userId})
-      const user = await User.findOne({_id:userId})
-      if(plans){
+      const plans = await Prime.find({ userId: userId });
+      const user = await User.findOne({ _id: userId });
+      if (plans) {
+        res.status(200).send({ success: true, data: plans[0].purchaseHistory });
+      } else {
         res
-        .status(200)
-        .send({ success: true , data:plans[0].purchaseHistory });
-      }else{
-        res
-        .status(200)
-        .send({ message: "You Are Not A Premium User", success: false });
+          .status(200)
+          .send({ message: "You Are Not A Premium User", success: false });
       }
-
     } else {
       res
-      .status(200)
-      .send({ message: "You Are Not A Premium User", success: false });
+        .status(200)
+        .send({ message: "You Are Not A Premium User", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
-const primiumCoustomers = async (req,res) =>{
+const primiumCoustomers = async (req, res) => {
   try {
-
-    const details = await Prime.find({})
-    .populate('userId')   
-    .populate('planId'); 
-    if(details){
-
+    const details = await Prime.find({}).populate("userId").populate("planId");
+    if (details) {
+      res.status(200).send({ success: true, data: details });
+    } else {
       res
-      .status(200)
-      .send({success: true,data:details});
-
-    }else{
-      res
-      .status(200)
-      .send({ message: "no membership purchase are present", success: false });
+        .status(200)
+        .send({
+          message: "no membership purchase are present",
+          success: false,
+        });
     }
-
-    
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
-}
+};
 
+const collectData = async (req, res) => {
+  try {
+    const id = sanitizeIdb(req.body.id);
 
-const collectData = async(req,res) =>{
- 
-try {
-  const id = req.body.id
+    const data = await Prime.findOne({ _id: id })
+      .populate("userId")
+      .populate("planId");
 
-  const data = await Prime.findOne({_id:id}).populate('userId')   
-  .populate('planId');
-  
-  if(data){
-    res
-    .status(200)
-    .send({success: true,data:data.purchaseHistory});
-
-  }else{
-    res
-    .status(200)
-    .send({ message: "no membership purchase are present", success: false });
+    if (data) {
+      res.status(200).send({ success: true, data: data.purchaseHistory });
+    } else {
+      res
+        .status(200)
+        .send({
+          message: "no membership purchase are present",
+          success: false,
+        });
+    }
+  } catch (error) {
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
-  
-} catch (error) {
-  console.log(error);
-}
-}
+};
 
 module.exports = {
   addPlan,
@@ -547,5 +551,5 @@ module.exports = {
   primecheck,
   fetchUserSubscribeHistory,
   primiumCoustomers,
-  collectData
+  collectData,
 };

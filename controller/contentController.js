@@ -1,5 +1,12 @@
 const Content =require('../models/contentModel')
 const cloudinary = require("cloudinary").v2;
+const mongoose = require('mongoose');
+const sanitizeId = (Id) => {
+  if (!mongoose.ObjectId.isValid(Id)) {
+    throw new Error('Invalid id');
+  }
+  return mongoose.ObjectId(Id);
+};
 require("dotenv").config();
 cloudinary.config({
     cloud_name: 'dcvjgllsv',
@@ -50,7 +57,8 @@ const addContent = async (req,res) =>{
           }
         }} 
     } catch (error) {
-        console.log(error);
+      console.error("An error occurred:", error);
+      res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 
@@ -63,7 +71,8 @@ const fetchData = async(req,res) =>{
           res.status(200).send({message: "fetching content failed" , success: true })
         }
     } catch (error) {
-        console.log(error);
+      console.error("An error occurred:", error);
+      res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 
@@ -77,7 +86,8 @@ const deleteContent = async(req,res) =>{
           res.status(200).send({message: "something went wrong", success: false })
         }
     } catch (error) {
-        console.log(error);
+      console.error("An error occurred:", error);
+      res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 

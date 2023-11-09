@@ -64,12 +64,10 @@ admin_route.post('/savefood',adminAuth,foodController.addFood);
 admin_route.post('/fetchsingleorder',adminAuth,orderController.fetchProductFromOrder);
 admin_route.post('/primeusersdetails',adminAuth,premiumController.primiumCoustomers);
 admin_route.post('/subscriptionadminsidesingledata',adminAuth,premiumController.collectData)
-//completed working fine
-
 admin_route.post('/fetchdetails',userController.fetchdetails)
 admin_route.post('/getprimeuserdata',userController.getPrimeUserDetails)
 admin_route.post('/fetchsingledata',userController.fetchSingleData)
-admin_route.post('/getchatdata',chatController.adminChatData)
+
 
 
 //check find pending

@@ -1,5 +1,12 @@
 const User = require("../models/userModel");
 const Chat = require("../models/chatModel")
+const mongoose = require('mongoose');
+const sanitizeId = (Id) => {
+  if (!mongoose.ObjectId.isValid(Id)) {
+    throw new Error('Invalid id');
+  }
+  return mongoose.ObjectId(Id);
+};
 const saveChat = async (data) =>{
   
     try {
@@ -39,7 +46,8 @@ const saveChat = async (data) =>{
   }
 
     } catch (error) {
-        console.log(error);
+      console.error("An error occurred:", error);
+      res.status(500).send({ message: "Internal server error", success: false });
     }
 }
 
@@ -67,14 +75,15 @@ const ChatLogs = async(req,res) =>{
     
   } catch (error) {
 
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
 
   }
 }
 
 const adminChatData = async(req,res) =>{
   try {
-    const id = req.body.id
+    const id = sanitizeId(req.body.id)
     if(id){
       const chat = await Chat.findOne({ chatRoom:id})
       if(chat){
@@ -96,7 +105,8 @@ const adminChatData = async(req,res) =>{
     
   } catch (error) {
 
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
 
   }
 } 

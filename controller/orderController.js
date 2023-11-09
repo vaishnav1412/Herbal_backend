@@ -4,6 +4,13 @@ const Address =require('../models/addressModel');
 const Order = require("../models/orderModel")
 require("dotenv").config();
 const Razorpay = require("razorpay");
+const mongoose = require('mongoose');
+const sanitizeId = (Id) => {
+  if (!mongoose.ObjectId.isValid(Id)) {
+    throw new Error('Invalid id');
+  }
+  return mongoose.ObjectId(Id);
+};
 
 var instance = new Razorpay({
   key_id: process.env.Key_Id,
@@ -15,7 +22,7 @@ const purchaseProduct =async(req,res) =>{
   
 try {
 
-    const  id = req.body.id
+    const  id = sanitizeId(req.body.id)
     const  addressId = req.body.selectedAddress
     if(id){
         if(addressId!==''){
@@ -87,14 +94,15 @@ for (const product of cartData.products) {
 
     
 } catch (error) {
-    console.log(error);
+  console.error("An error occurred:", error);
+  res.status(500).send({ message: "Internal server error", success: false });
 }
 }
 
 const verifyProductPayment = async (req, res) => {
   try {
     console.log('djfgjgfkgrsh');
-    const orderId = req.body.orderId ;
+    const orderId = sanitizeId( req.body.orderId );
     console.log(orderId);
     const userId = req.body.id
     if (userId) {
@@ -126,13 +134,14 @@ const verifyProductPayment = async (req, res) => {
         .send({ message: "payment varification failed", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 };
 
 const fetchSingleOrders = async(req,res) =>{
   try {
-    const userId = req.userId
+    const userId = sanitizeId(req.userId)
     if(userId){
       const order = await Order.find({userId:userId})
       if(!order){
@@ -153,7 +162,8 @@ const fetchSingleOrders = async(req,res) =>{
     }
     
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 }
 
@@ -171,7 +181,8 @@ const dashboarddisplayOrders = async(req,res) =>{
       .send({ message: "something went wrong.", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 }
 
@@ -189,13 +200,14 @@ const displayOrders = async(req,res) =>{
       .send({ message: "something went wrong.", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 }
 
 const fetchProductFromOrder = async(req,res) =>{
   try {
-    const id = req.body.id
+    const id = sanitizeId(req.body.id)
    if(id){
 
     const order = await Order.find({_id:id})
@@ -216,13 +228,14 @@ const fetchProductFromOrder = async(req,res) =>{
     .send({ message: "something went wrong.", success: false });
    }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 }
 
 const changeStatus = async(req,res) =>{
   try {
-    const id = req.body.id
+    const id =sanitizeId( req.body.id)
     if(id){
       const order = await Order.find({_id:id})
       console.log(order);
@@ -260,7 +273,8 @@ const changeStatus = async(req,res) =>{
     .send({ message: "something went wrong.", success: false });
     }
   } catch (error) {
-    console.log(error);
+    console.error("An error occurred:", error);
+    res.status(500).send({ message: "Internal server error", success: false });
   }
 }
 
